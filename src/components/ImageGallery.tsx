@@ -46,7 +46,7 @@ export default function ImageGallery({ images, videos, productName }: ImageGalle
           <video
             src={allMedia[currentIndex]}
             controls
-            className="w-full aspect-[3/4] object-cover rounded-md bg-gray-100"
+            className="w-full aspect-[3/4] object-contain rounded-md bg-gray-100"
           />
         ) : imageError.has(currentIndex) ? (
           <div className="w-full aspect-[3/4] bg-gray-100 rounded-md flex items-center justify-center text-gray-400">
@@ -56,7 +56,7 @@ export default function ImageGallery({ images, videos, productName }: ImageGalle
           <img
             src={allMedia[currentIndex]}
             alt={`${productName} ${currentIndex + 1}`}
-            className="w-full aspect-[3/4] object-cover rounded-md"
+            className="w-full aspect-[3/4] object-contain rounded-md"
             onError={() => handleImageError(currentIndex)}
           />
         )}

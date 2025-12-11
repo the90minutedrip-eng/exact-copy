@@ -69,14 +69,14 @@ export default function ImageGallery({ images, videos, productName }: ImageGalle
               className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white rounded-full p-2 shadow transition-colors"
               aria-label="Previous image"
             >
-              <
+              '<'
             </button>
             <button
               onClick={next}
               className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white rounded-full p-2 shadow transition-colors"
               aria-label="Next image"
             >
-              >
+              '>'
             </button>
           </>
         )}

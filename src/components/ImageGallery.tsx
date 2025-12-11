@@ -32,7 +32,7 @@ export default function ImageGallery({ images, videos, productName }: ImageGalle
 
   if (allMedia.length === 0) {
     return (
-      <div className="w-full h-80 bg-gray-100 rounded-md flex items-center justify-center text-gray-400">
+      <div className="w-full aspect-[3/4] bg-gray-100 rounded-md flex items-center justify-center text-gray-400">
         No Image Available
       </div>
     );
@@ -46,17 +46,17 @@ export default function ImageGallery({ images, videos, productName }: ImageGalle
           <video
             src={allMedia[currentIndex]}
             controls
-            className="w-full h-80 object-cover rounded-md bg-gray-100"
+            className="w-full aspect-[3/4] object-cover rounded-md bg-gray-100"
           />
         ) : imageError.has(currentIndex) ? (
-          <div className="w-full h-80 bg-gray-100 rounded-md flex items-center justify-center text-gray-400">
+          <div className="w-full aspect-[3/4] bg-gray-100 rounded-md flex items-center justify-center text-gray-400">
             Image unavailable
           </div>
         ) : (
           <img
             src={allMedia[currentIndex]}
             alt={`${productName} ${currentIndex + 1}`}
-            className="w-full h-80 object-cover rounded-md"
+            className="w-full aspect-[3/4] object-cover rounded-md"
             onError={() => handleImageError(currentIndex)}
           />
         )}

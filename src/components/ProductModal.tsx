@@ -9,10 +9,12 @@ interface ProductModalProps {
 }
 
 const WHATSAPP_NUMBER = '918139016845';
+const DESCRIPTION_CHAR_LIMIT = 150;
 
 export default function ProductModal({ product, onClose }: ProductModalProps) {
   const [selectedSize, setSelectedSize] = useState<SizeKey | null>(null);
   const [showSizeWarning, setShowSizeWarning] = useState(false);
+  const [showFullDescription, setShowFullDescription] = useState(false);
 
   const hasDiscount = product.originalPrice && product.price && product.originalPrice > product.price;
   const discount = hasDiscount ? calculateDiscount(product.price!, product.originalPrice!) : 0;
@@ -149,9 +151,21 @@ Can you confirm availability and next steps?`;
 
             {/* Description */}
             {product.description && (
-              <p className="mt-4 text-sm text-gray-700 leading-relaxed">
-                {product.description}
-              </p>
+              <div className="mt-4">
+                <p className="text-sm text-gray-700 leading-relaxed">
+                  {showFullDescription || product.description.length <= DESCRIPTION_CHAR_LIMIT
+                    ? product.description
+                    : `${product.description.slice(0, DESCRIPTION_CHAR_LIMIT)}...`}
+                </p>
+                {product.description.length > DESCRIPTION_CHAR_LIMIT && (
+                  <button
+                    onClick={() => setShowFullDescription(!showFullDescription)}
+                    className="mt-1 text-sm text-green-600 hover:text-green-700 font-medium"
+                  >
+                    {showFullDescription ? 'Show less' : 'More'}
+                  </button>
+                )}
+              </div>
             )}
 
             {/* Size Selector */}

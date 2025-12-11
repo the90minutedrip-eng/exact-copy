@@ -1,73 +1,128 @@
-# Welcome to your Lovable project
+# The 90-Minute Drip
 
-## Project info
+A minimal, lightweight jersey catalog website that fetches product data from a Google Sheet CSV.
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+## Features
 
-## How can I edit this code?
+- **Live Google Sheet Integration**: Products are fetched from a published Google Sheet CSV
+- **5-Minute Client-Side Cache**: Reduces API calls and improves performance
+- **Search & Filter**: Instant client-side search across product name, team, category, and description
+- **Category Filters**: Multi-select category filtering
+- **Product Modal**: Image gallery with video support, size selection, and WhatsApp inquiry
+- **Responsive Design**: Mobile-first grid layout
+- **Lazy Loading**: Images load on demand for better performance
 
-There are several ways of editing your application.
+## Configuration
 
-**Use Lovable**
+### CSV URL
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+Update the CSV URL in `src/services/googleSheetsService.ts`:
 
-Changes made via Lovable will be committed automatically to this repo.
+```typescript
+export const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/YOUR_SHEET_ID/pub?output=csv';
+```
 
-**Use your preferred IDE**
+### WhatsApp Number
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+Update the WhatsApp number in `src/components/ProductModal.tsx`:
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+```typescript
+const WHATSAPP_NUMBER = '918139016845';
+```
 
-Follow these steps:
+## Google Sheet Column Headers
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+The sheet must have these exact headers (case-sensitive):
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+| Column | Type | Description |
+|--------|------|-------------|
+| ProductName | string | Product display name |
+| Team | string | Team/brand name |
+| Category | string | Product category (e.g., "new season", "retro") |
+| Season | string | Season identifier (e.g., "2024-25") |
+| Price | number | Current price (can include ₹ symbol) |
+| OriginalPrice | number | Original price for discount calculation |
+| ImageURLs | string | Comma-separated image URLs |
+| VideoURLs | string | Comma-separated video URLs |
+| Stock_XS | number | Stock quantity for XS |
+| Stock_S | number | Stock quantity for S |
+| Stock_M | number | Stock quantity for M |
+| Stock_L | number | Stock quantity for L |
+| Stock_XL | number | Stock quantity for XL |
+| Stock_XXL | number | Stock quantity for XXL |
+| LimitedEdition | string | "yes" or "no" |
+| Description | string | Full product description |
+| ShortDescription | string | Brief description for cards |
+| Status | string | Must be "published" to show |
+| DateAdded | string | Date for sorting (newest first) |
 
-# Step 3: Install the necessary dependencies.
-npm i
+## Caching
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+Products are cached for 5 minutes (300,000ms) using:
+1. **Memory cache**: Fast in-session retrieval
+2. **localStorage**: Persists across page reloads
+
+### Clear Cache
+
+To force a fresh fetch, call:
+
+```typescript
+import { clearCache } from '@/services/googleSheetsService';
+clearCache();
+```
+
+Or open browser DevTools and run:
+```javascript
+localStorage.removeItem('the90minutedrip_products');
+localStorage.removeItem('the90minutedrip_cache_timestamp');
+```
+
+## Development
+
+```bash
+npm install
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+## Testing
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+```bash
+npm run test
+```
 
-**Use GitHub Codespaces**
+## Deployment (Vercel)
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+1. Push to GitHub
+2. Import project in Vercel
+3. Deploy automatically
 
-## What technologies are used for this project?
+## Adding New Columns
 
-This project is built with:
+1. Add the column to your Google Sheet
+2. Update `src/types/product.ts` with the new field
+3. Update `parseProducts()` in `src/services/googleSheetsService.ts` to extract the value
+4. Use the new field in your components
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+## How to Test Checklist
 
-## How can I deploy this project?
+### WhatsApp Message
+1. Click a product card
+2. Select a size
+3. Click "Inquire on WhatsApp"
+4. Verify the prefilled message contains: Product, Team, Season, Size, Price
 
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
+### Size Availability
+1. Open a product modal
+2. Verify sizes with stock > 0 are clickable
+3. Verify sizes with stock = 0 show "Out of stock" and are disabled
 
-## Can I connect a custom domain to my Lovable project?
+### Discount Badge
+1. Find a product where OriginalPrice > Price
+2. Verify discount badge shows correct percentage
+3. Verify original price is struck through
 
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+### Caching
+1. Open Network tab in DevTools
+2. Load the page (should fetch CSV)
+3. Refresh within 5 minutes (should NOT fetch CSV)
+4. Wait 5+ minutes and refresh (should fetch CSV again)

@@ -6,6 +6,7 @@ import ProductGrid from './ProductGrid';
 import ProductModal from './ProductModal';
 import LoadingSpinner from './LoadingSpinner';
 import ErrorState from './ErrorState';
+import PromoBanner from './PromoBanner';
 
 const CONTACT_EMAIL = 'the90minutedrip@gmail.com';
 
@@ -62,6 +63,9 @@ export default function The90MinuteDrip() {
 
   return (
     <div className="min-h-screen bg-white text-black antialiased flex flex-col">
+      {/* Promo Banner */}
+      <PromoBanner />
+
       {/* Header */}
       <header className="py-6 px-6 border-b border-gray-100">
         <div className="max-w-6xl mx-auto">

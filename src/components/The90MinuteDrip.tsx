@@ -17,6 +17,7 @@ export default function The90MinuteDrip() {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [priceRange, setPriceRange] = useState<[number, number]>([0, 0]);
 
   const loadProducts = useCallback(async () => {
     setLoading(true);
@@ -24,6 +25,9 @@ export default function The90MinuteDrip() {
     try {
       const data = await fetchProducts();
       setProducts(data);
+      // Set initial price range based on max price
+      const max = Math.max(...data.map(p => p.price || 0), 0);
+      setPriceRange([0, max]);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load products');
     } finally {
@@ -34,6 +38,11 @@ export default function The90MinuteDrip() {
   useEffect(() => {
     loadProducts();
   }, [loadProducts]);
+
+  // Get max price for slider
+  const maxPrice = useMemo(() => {
+    return Math.max(...products.map(p => p.price || 0), 0);
+  }, [products]);
 
   // Get unique categories
   const categories = useMemo(() => getCategories(products), [products]);
@@ -53,8 +62,14 @@ export default function The90MinuteDrip() {
       result = result.filter(p => p.searchIndex.includes(query));
     }
 
+    // Filter by price range
+    result = result.filter(p => {
+      const price = p.price || 0;
+      return price >= priceRange[0] && price <= priceRange[1];
+    });
+
     return result;
-  }, [products, selectedCategories, searchQuery]);
+  }, [products, selectedCategories, searchQuery, priceRange]);
 
   const handleRetry = () => {
     clearCache();
@@ -95,6 +110,9 @@ export default function The90MinuteDrip() {
               onCategoryChange={setSelectedCategories}
               searchQuery={searchQuery}
               onSearchChange={setSearchQuery}
+              priceRange={priceRange}
+              onPriceRangeChange={setPriceRange}
+              maxPrice={maxPrice}
             />
 
             {/* Product Grid */}

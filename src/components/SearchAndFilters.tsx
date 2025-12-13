@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Slider } from '@/components/ui/slider';
 
 interface SearchAndFiltersProps {
   categories: string[];
@@ -6,6 +7,9 @@ interface SearchAndFiltersProps {
   onCategoryChange: (categories: string[]) => void;
   searchQuery: string;
   onSearchChange: (query: string) => void;
+  priceRange: [number, number];
+  onPriceRangeChange: (range: [number, number]) => void;
+  maxPrice: number;
 }
 
 export default function SearchAndFilters({
@@ -14,6 +18,9 @@ export default function SearchAndFilters({
   onCategoryChange,
   searchQuery,
   onSearchChange,
+  priceRange,
+  onPriceRangeChange,
+  maxPrice,
 }: SearchAndFiltersProps) {
   const [localQuery, setLocalQuery] = useState(searchQuery);
 
@@ -37,9 +44,10 @@ export default function SearchAndFilters({
     onCategoryChange([]);
     setLocalQuery('');
     onSearchChange('');
+    onPriceRangeChange([0, maxPrice]);
   };
 
-  const hasFilters = selectedCategories.length > 0 || searchQuery.length > 0;
+  const hasFilters = selectedCategories.length > 0 || searchQuery.length > 0 || priceRange[0] > 0 || priceRange[1] < maxPrice;
 
   return (
     <div className="space-y-4">
@@ -51,7 +59,7 @@ export default function SearchAndFilters({
           type="text"
           value={localQuery}
           onChange={(e) => setLocalQuery(e.target.value)}
-          placeholder="Search jerseys — name, team, or category"
+          placeholder="Search jerseys..."
           className="w-full px-4 py-3 border border-gray-200 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
         />
         {localQuery && (
@@ -68,36 +76,63 @@ export default function SearchAndFilters({
         )}
       </div>
 
-      {/* Category Filters */}
-      {categories.length > 0 && (
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="text-sm text-gray-500">Filter:</span>
-          {categories.map(category => {
-            const isSelected = selectedCategories.includes(category);
-            return (
+      {/* Filters Row */}
+      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+        {/* Category Filters */}
+        {categories.length > 0 && (
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-sm text-gray-500">Filter:</span>
+            {categories.map(category => {
+              const isSelected = selectedCategories.includes(category);
+              return (
+                <button
+                  key={category}
+                  onClick={() => toggleCategory(category)}
+                  className={`px-3 py-1.5 text-sm rounded-full border transition-all ${
+                    isSelected
+                      ? 'bg-black text-white border-black'
+                      : 'bg-white text-gray-700 border-gray-200 hover:border-gray-400'
+                  }`}
+                >
+                  {category}
+                </button>
+              );
+            })}
+            {hasFilters && (
               <button
-                key={category}
-                onClick={() => toggleCategory(category)}
-                className={`px-3 py-1.5 text-sm rounded-full border transition-all ${
-                  isSelected
-                    ? 'bg-black text-white border-black'
-                    : 'bg-white text-gray-700 border-gray-200 hover:border-gray-400'
-                }`}
+                onClick={clearFilters}
+                className="px-3 py-1.5 text-sm text-gray-500 hover:text-gray-700 underline"
               >
-                {category}
+                Clear all
               </button>
-            );
-          })}
-          {hasFilters && (
-            <button
-              onClick={clearFilters}
-              className="px-3 py-1.5 text-sm text-gray-500 hover:text-gray-700 underline"
-            >
-              Clear all
-            </button>
-          )}
-        </div>
-      )}
+            )}
+          </div>
+        )}
+
+        {/* Price Range Filter */}
+        {maxPrice > 0 && (
+          <div className="w-full sm:w-64 flex-shrink-0">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-sm text-gray-500">Price Range</span>
+              <span className="text-sm font-medium">
+                ₹{priceRange[0].toLocaleString()} - ₹{priceRange[1].toLocaleString()}
+              </span>
+            </div>
+            <Slider
+              value={priceRange}
+              onValueChange={(value) => onPriceRangeChange(value as [number, number])}
+              min={0}
+              max={maxPrice}
+              step={50}
+              className="w-full"
+            />
+            <div className="flex justify-between mt-1 text-xs text-gray-400">
+              <span>₹0</span>
+              <span>₹{maxPrice.toLocaleString()}</span>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

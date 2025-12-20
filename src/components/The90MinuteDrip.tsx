@@ -128,10 +128,13 @@ export default function The90MinuteDrip() {
       {/* Footer */}
       <footer className="py-6 border-t border-gray-100">
         <div className="max-w-6xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-gray-600">
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4 flex-wrap">
             <span>Made for fans — browse and inquire on WhatsApp.</span>
             <Link to="/terms" className="underline hover:text-black">
               Terms & Conditions
+            </Link>
+            <Link to="/refund" className="underline hover:text-black">
+              Refund Policy
             </Link>
           </div>
           <div>

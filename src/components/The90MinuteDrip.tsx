@@ -136,6 +136,9 @@ export default function The90MinuteDrip() {
             <Link to="/refund" className="underline hover:text-black">
               Refund Policy
             </Link>
+            <Link to="/shipping" className="underline hover:text-black">
+              Shipping
+            </Link>
           </div>
           <div>
             Contact:{' '}

@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
+import { Link } from 'react-router-dom';
 import { Product } from '@/types/product';
 import { fetchProducts, getCategories, clearCache } from '@/services/googleSheetsService';
 import SearchAndFilters from './SearchAndFilters';
@@ -127,7 +128,12 @@ export default function The90MinuteDrip() {
       {/* Footer */}
       <footer className="py-6 border-t border-gray-100">
         <div className="max-w-6xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-gray-600">
-          <div>Made for fans — browse and inquire on WhatsApp.</div>
+          <div className="flex items-center gap-4">
+            <span>Made for fans — browse and inquire on WhatsApp.</span>
+            <Link to="/terms" className="underline hover:text-black">
+              Terms & Conditions
+            </Link>
+          </div>
           <div>
             Contact:{' '}
             <a href={`mailto:${CONTACT_EMAIL}`} className="underline hover:text-black">

@@ -139,6 +139,9 @@ export default function The90MinuteDrip() {
             <Link to="/shipping" className="underline hover:text-black">
               Shipping
             </Link>
+            <Link to="/contact" className="underline hover:text-black">
+              Contact Us
+            </Link>
           </div>
           <div>
             Contact:{' '}

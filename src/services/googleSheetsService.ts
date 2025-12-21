@@ -259,52 +259,6 @@ export function clearCache(): void {
 }
 
 /**
- * Sample products for fallback/demo
- */
-function getSampleProducts(): Product[] {
-  return [
-    {
-      id: 'sample-1',
-      productName: 'Classic Football Jersey',
-      team: 'Arsenal',
-      category: 'Football',
-      season: '2024',
-      price: 45,
-      originalPrice: 65,
-      images: ['https://images.pexels.com/photos/3394650/pexels-photo-3394650.jpeg?auto=compress&cs=tinysrgb&w=400'],
-      videos: [],
-      stock: { XS: 5, S: 10, M: 15, L: 12, XL: 8, XXL: 3 },
-      availableSizes: ['S', 'M', 'L', 'XL', 'XXL'],
-      limitedEdition: false,
-      description: 'Authentic classic football jersey',
-      shortDescription: 'Classic design',
-      status: 'published',
-      dateAdded: new Date().toISOString(),
-      searchIndex: 'classic football jersey arsenal 2024',
-    },
-    {
-      id: 'sample-2',
-      productName: 'Retro Vintage Jersey',
-      team: 'Manchester United',
-      category: 'Football',
-      season: '1990s',
-      price: 55,
-      originalPrice: null,
-      images: ['https://images.pexels.com/photos/3393926/pexels-photo-3393926.jpeg?auto=compress&cs=tinysrgb&w=400'],
-      videos: [],
-      stock: { XS: 2, S: 5, M: 8, L: 6, XL: 4, XXL: 1 },
-      availableSizes: ['M', 'L', 'XL'],
-      limitedEdition: true,
-      description: 'Limited edition retro vintage jersey',
-      shortDescription: 'Retro 90s',
-      status: 'published',
-      dateAdded: new Date(Date.now() - 86400000).toISOString(),
-      searchIndex: 'retro vintage jersey manchester united 1990s',
-    },
-  ];
-}
-
-/**
  * Fetch and parse products from Google Sheet
  */
 export async function fetchProducts(): Promise<Product[]> {
@@ -314,37 +268,19 @@ export async function fetchProducts(): Promise<Product[]> {
     return cached;
   }
 
-  try {
-    // Fetch fresh data
-    const response = await fetch(CSV_URL, { signal: AbortSignal.timeout(10000) });
-    if (!response.ok) {
-      console.warn(`Google Sheets fetch failed: ${response.status}. Using sample data.`);
-      const sampleProducts = getSampleProducts();
-      setCachedProducts(sampleProducts);
-      return sampleProducts;
-    }
-
-    const csvText = await response.text();
-    const products = parseProducts(csvText);
-
-    // If no products found, use sample data
-    if (products.length === 0) {
-      console.warn('No products found in sheet. Using sample data.');
-      const sampleProducts = getSampleProducts();
-      setCachedProducts(sampleProducts);
-      return sampleProducts;
-    }
-
-    // Cache the results
-    setCachedProducts(products);
-
-    return products;
-  } catch (error) {
-    console.warn('Failed to fetch products. Using sample data.', error);
-    const sampleProducts = getSampleProducts();
-    setCachedProducts(sampleProducts);
-    return sampleProducts;
+  // Fetch fresh data
+  const response = await fetch(CSV_URL);
+  if (!response.ok) {
+    throw new Error(`Failed to fetch products: ${response.status} ${response.statusText}`);
   }
+
+  const csvText = await response.text();
+  const products = parseProducts(csvText);
+
+  // Cache the results
+  setCachedProducts(products);
+
+  return products;
 }
 
 /**

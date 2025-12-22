@@ -163,7 +163,6 @@ export function parseProducts(csvText: string): Product[] {
       status,
       dateAdded: getValue('DateAdded'),
       searchIndex,
-      buyLink: getValue('BuyLink'),
     };
 
     products.push(product);

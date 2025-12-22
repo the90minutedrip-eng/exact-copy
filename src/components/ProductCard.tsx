@@ -15,9 +15,7 @@ export default function ProductCard({ product, onClick }: ProductCardProps) {
 
   const handleBuyClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (product.buyLink) {
-      window.open(product.buyLink, '_blank', 'noopener,noreferrer');
-    }
+    // TODO: Implement buy link generation via API
   };
 
   return (
@@ -108,12 +106,10 @@ export default function ProductCard({ product, onClick }: ProductCardProps) {
         </div>
       </button>
 
-      {/* Buy Button */}
       <div className="p-4 pt-0">
         <Button 
           onClick={handleBuyClick}
           className="w-full bg-black hover:bg-gray-800 text-white"
-          disabled={!product.buyLink}
         >
           <ShoppingCart className="w-4 h-4 mr-2" />
           Buy Now

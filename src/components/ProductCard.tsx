@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom';
 import { Product } from '@/types/product';
 import { calculateDiscount } from '@/services/googleSheetsService';
 import { Button } from '@/components/ui/button';
@@ -9,13 +10,14 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ product, onClick }: ProductCardProps) {
+  const navigate = useNavigate();
   const hasDiscount = product.originalPrice && product.price && product.originalPrice > product.price;
   const discount = hasDiscount ? calculateDiscount(product.price!, product.originalPrice!) : 0;
   const hasImage = product.images.length > 0;
 
   const handleBuyClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    // TODO: Implement buy link generation via API
+    navigate('/order', { state: { product } });
   };
 
   return (

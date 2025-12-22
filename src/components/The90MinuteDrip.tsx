@@ -83,11 +83,11 @@ export default function The90MinuteDrip() {
       <PromoBanner />
 
       {/* Header */}
-      <header className="py-4 sm:py-6 px-4 sm:px-6 border-b border-gray-100">
+      <header className="py-6 px-6 border-b border-gray-100">
         <div className="max-w-6xl mx-auto">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
-            <h1 className="text-xl sm:text-2xl font-semibold tracking-tight">The 90-Minute Drip</h1>
-            <div className="text-xs sm:text-sm text-gray-500">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <h1 className="text-2xl font-semibold tracking-tight">The 90-Minute Drip</h1>
+            <div className="text-sm text-gray-500">
               {!loading && !error && (
                 <span>{filteredProducts.length} of {products.length} jerseys</span>
               )}
@@ -97,7 +97,7 @@ export default function The90MinuteDrip() {
       </header>
 
       {/* Main Content */}
-      <main className="flex-1 max-w-6xl mx-auto w-full p-4 sm:p-6">
+      <main className="flex-1 max-w-6xl mx-auto w-full p-6">
         {loading ? (
           <LoadingSpinner />
         ) : error ? (
@@ -126,25 +126,26 @@ export default function The90MinuteDrip() {
       </main>
 
       {/* Footer */}
-      <footer className="py-4 sm:py-6 border-t border-gray-100">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4 text-xs sm:text-sm text-gray-600">
-          <div className="flex items-center gap-2 sm:gap-4 flex-wrap justify-center sm:justify-start">
-            <span className="w-full sm:w-auto text-center sm:text-left">Made for fans — inquire on WhatsApp.</span>
+      <footer className="py-6 border-t border-gray-100">
+        <div className="max-w-6xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-gray-600">
+          <div className="flex items-center gap-4 flex-wrap">
+            <span>Made for fans — browse and inquire on WhatsApp.</span>
             <Link to="/terms" className="underline hover:text-black">
-              Terms
+              Terms & Conditions
             </Link>
             <Link to="/refund" className="underline hover:text-black">
-              Refund
+              Refund Policy
             </Link>
             <Link to="/shipping" className="underline hover:text-black">
               Shipping
             </Link>
             <Link to="/contact" className="underline hover:text-black">
-              Contact
+              Contact Us
             </Link>
           </div>
-          <div className="text-center sm:text-left">
-            <a href={`mailto:${CONTACT_EMAIL}`} className="underline hover:text-black break-all">
+          <div>
+            Contact:{' '}
+            <a href={`mailto:${CONTACT_EMAIL}`} className="underline hover:text-black">
               {CONTACT_EMAIL}
             </a>
           </div>

@@ -25,6 +25,7 @@ export interface Product {
   status: string;
   dateAdded: string;
   searchIndex: string;
+  buyLink: string;
 }
 
 export type SizeKey = keyof ProductStock;

@@ -1,5 +1,7 @@
 import { Product } from '@/types/product';
 import { calculateDiscount } from '@/services/googleSheetsService';
+import { Button } from '@/components/ui/button';
+import { ShoppingCart } from 'lucide-react';
 
 interface ProductCardProps {
   product: Product;
@@ -11,9 +13,16 @@ export default function ProductCard({ product, onClick }: ProductCardProps) {
   const discount = hasDiscount ? calculateDiscount(product.price!, product.originalPrice!) : 0;
   const hasImage = product.images.length > 0;
 
+  const handleBuyClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (product.buyLink) {
+      window.open(product.buyLink, '_blank', 'noopener,noreferrer');
+    }
+  };
+
   return (
-    <article className="border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow bg-white">
-      <button onClick={onClick} className="w-full text-left">
+    <article className="border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow bg-white flex flex-col">
+      <button onClick={onClick} className="w-full text-left flex-1">
         {/* Image or Fallback */}
         <div className="h-56 bg-gray-50 flex items-center justify-center relative">
           {hasImage ? (
@@ -98,6 +107,18 @@ export default function ProductCard({ product, onClick }: ProductCardProps) {
           )}
         </div>
       </button>
+
+      {/* Buy Button */}
+      <div className="p-4 pt-0">
+        <Button 
+          onClick={handleBuyClick}
+          className="w-full bg-black hover:bg-gray-800 text-white"
+          disabled={!product.buyLink}
+        >
+          <ShoppingCart className="w-4 h-4 mr-2" />
+          Buy Now
+        </Button>
+      </div>
     </article>
   );
 }

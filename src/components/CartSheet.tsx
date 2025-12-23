@@ -118,10 +118,10 @@ export default function CartSheet({ children }: CartSheetProps) {
                             </div>
                             <div className="flex justify-between text-sm text-gray-500">
                                 <p>Shipping</p>
-                                <p className="text-green-600">Free</p>
+                                <p className="text-blue-600 text-xs">Select address to check shipping cost</p>
                             </div>
                             <div className="flex justify-between text-lg font-bold text-gray-900 border-t pt-4">
-                                <p>Total</p>
+                                <p>Subtotal</p>
                                 <p>₹{getCartTotal()}</p>
                             </div>
                             <div className="mt-6">

@@ -74,6 +74,49 @@ const OrderConfirmation = () => {
     setFormData((prev) => ({ ...prev, selectedSize: value as SizeKey }));
   };
 
+  const handleStateChange = (value: string) => {
+    setFormData((prev) => ({ ...prev, state: value }));
+  };
+
+  // Calculate shipping charges
+  const calculateShipping = () => {
+    const subtotal = isSingleBuy ? (singleProduct.price || 0) : getCartTotal();
+    const state = formData.state.toLowerCase();
+
+    // Kerala: ₹40 default, free if cart > ₹600
+    if (state === 'kerala') {
+      return subtotal > 600 ? 0 : 40;
+    }
+
+    // Other states: ₹80 default, free if cart > ₹1000
+    return subtotal > 1000 ? 0 : 80;
+  };
+
+  const shippingCharge = calculateShipping();
+  const subtotal = isSingleBuy ? (singleProduct.price || 0) : getCartTotal();
+  const finalTotal = subtotal + shippingCharge;
+
+  // Calculate how much more needed for free shipping
+  const getFreeShippingMessage = () => {
+    if (!formData.state) return null;
+
+    const state = formData.state.toLowerCase();
+    if (state === 'kerala') {
+      const needed = 600 - subtotal;
+      if (needed > 0) {
+        return `Add ₹${needed} more to get free shipping!`;
+      }
+    } else {
+      const needed = 1000 - subtotal;
+      if (needed > 0) {
+        return `Add ₹${needed} more to get free shipping!`;
+      }
+    }
+    return null;
+  };
+
+  const freeShippingMessage = getFreeShippingMessage();
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -98,9 +141,7 @@ const OrderConfirmation = () => {
     setIsLoading(true);
 
     try {
-      const finalPrice = isSingleBuy
-        ? (singleProduct.price || 0)
-        : getCartTotal();
+      const finalPrice = finalTotal;
 
       const productName = isSingleBuy
         ? singleProduct.productName
@@ -147,9 +188,7 @@ const OrderConfirmation = () => {
     }
   };
 
-  const finalPrice = isSingleBuy
-    ? (singleProduct.price || 0)
-    : getCartTotal();
+  // Removed duplicate finalPrice calculation (now using finalTotal from shipping logic)
 
   return (
     <div className="min-h-screen bg-background">
@@ -190,15 +229,28 @@ const OrderConfirmation = () => {
             <div className="mt-6 pt-4 border-t">
               <div className="flex justify-between text-sm mb-2">
                 <span>Subtotal</span>
-                <span>₹{finalPrice}</span>
+                <span>₹{subtotal}</span>
               </div>
               <div className="flex justify-between text-sm mb-2">
                 <span>Shipping</span>
-                <span className="text-green-600">Free</span>
+                <div className="text-right">
+                  {!formData.state ? (
+                    <span className="text-blue-600 text-xs">Select state to check shipping</span>
+                  ) : shippingCharge === 0 ? (
+                    <span className="text-green-600">Free</span>
+                  ) : (
+                    <span>₹{shippingCharge}</span>
+                  )}
+                </div>
               </div>
+              {freeShippingMessage && (
+                <div className="flex justify-end text-xs text-orange-600 mb-2">
+                  {freeShippingMessage}
+                </div>
+              )}
               <div className="flex justify-between font-bold text-lg pt-2 border-t">
                 <span>Total</span>
-                <span>₹{finalPrice}</span>
+                <span>₹{finalTotal}</span>
               </div>
             </div>
           </div>
@@ -293,14 +345,44 @@ const OrderConfirmation = () => {
                 </div>
                 <div>
                   <Label htmlFor="state">State *</Label>
-                  <Input
-                    id="state"
-                    name="state"
+                  <Select
                     value={formData.state}
-                    onChange={handleInputChange}
-                    required
-                    placeholder="State"
-                  />
+                    onValueChange={handleStateChange}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select state" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Kerala">Kerala</SelectItem>
+                      <SelectItem value="Andhra Pradesh">Andhra Pradesh</SelectItem>
+                      <SelectItem value="Arunachal Pradesh">Arunachal Pradesh</SelectItem>
+                      <SelectItem value="Assam">Assam</SelectItem>
+                      <SelectItem value="Bihar">Bihar</SelectItem>
+                      <SelectItem value="Chhattisgarh">Chhattisgarh</SelectItem>
+                      <SelectItem value="Goa">Goa</SelectItem>
+                      <SelectItem value="Gujarat">Gujarat</SelectItem>
+                      <SelectItem value="Haryana">Haryana</SelectItem>
+                      <SelectItem value="Himachal Pradesh">Himachal Pradesh</SelectItem>
+                      <SelectItem value="Jharkhand">Jharkhand</SelectItem>
+                      <SelectItem value="Karnataka">Karnataka</SelectItem>
+                      <SelectItem value="Madhya Pradesh">Madhya Pradesh</SelectItem>
+                      <SelectItem value="Maharashtra">Maharashtra</SelectItem>
+                      <SelectItem value="Manipur">Manipur</SelectItem>
+                      <SelectItem value="Meghalaya">Meghalaya</SelectItem>
+                      <SelectItem value="Mizoram">Mizoram</SelectItem>
+                      <SelectItem value="Nagaland">Nagaland</SelectItem>
+                      <SelectItem value="Odisha">Odisha</SelectItem>
+                      <SelectItem value="Punjab">Punjab</SelectItem>
+                      <SelectItem value="Rajasthan">Rajasthan</SelectItem>
+                      <SelectItem value="Sikkim">Sikkim</SelectItem>
+                      <SelectItem value="Tamil Nadu">Tamil Nadu</SelectItem>
+                      <SelectItem value="Telangana">Telangana</SelectItem>
+                      <SelectItem value="Tripura">Tripura</SelectItem>
+                      <SelectItem value="Uttar Pradesh">Uttar Pradesh</SelectItem>
+                      <SelectItem value="Uttarakhand">Uttarakhand</SelectItem>
+                      <SelectItem value="West Bengal">West Bengal</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
 
@@ -328,7 +410,7 @@ const OrderConfirmation = () => {
                     Processing...
                   </>
                 ) : (
-                  `Pay ₹${finalPrice}`
+                  `Pay ₹${finalTotal}`
                 )}
               </Button>
             </form>

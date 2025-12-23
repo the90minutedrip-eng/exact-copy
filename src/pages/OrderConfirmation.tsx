@@ -80,6 +80,11 @@ const OrderConfirmation = () => {
 
   // Calculate shipping charges
   const calculateShipping = () => {
+    // Return 0 if no state is selected yet
+    if (!formData.state) {
+      return 0;
+    }
+
     const subtotal = isSingleBuy ? (singleProduct.price || 0) : getCartTotal();
     const state = formData.state.toLowerCase();
 

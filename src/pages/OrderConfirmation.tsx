@@ -90,11 +90,11 @@ const OrderConfirmation = () => {
 
     // Kerala: ₹40 default, free if cart > ₹600
     if (state === 'kerala') {
-      return subtotal > 600 ? 0 : 40;
+      return subtotal >= 600 ? 0 : 40;
     }
 
     // Other states: ₹80 default, free if cart > ₹1000
-    return subtotal > 1000 ? 0 : 80;
+    return subtotal >= 1000 ? 0 : 80;
   };
 
   const shippingCharge = calculateShipping();

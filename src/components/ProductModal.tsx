@@ -1,5 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { ShoppingCart, ShoppingBag } from 'lucide-react';
 import { Product, SIZES, SizeKey } from '@/types/product';
+import { useCart } from '@/contexts/CartContext';
 import { calculateDiscount } from '@/services/googleSheetsService';
 import ImageGallery from './ImageGallery';
 
@@ -15,6 +18,8 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
   const [selectedSize, setSelectedSize] = useState<SizeKey | null>(null);
   const [showSizeWarning, setShowSizeWarning] = useState(false);
   const [showFullDescription, setShowFullDescription] = useState(false);
+  const navigate = useNavigate();
+  const { addToCart } = useCart();
 
   const hasDiscount = product.originalPrice && product.price && product.originalPrice > product.price;
   const discount = hasDiscount ? calculateDiscount(product.price!, product.originalPrice!) : 0;
@@ -60,6 +65,32 @@ Can you confirm availability and next steps?`;
       return;
     }
     window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${generateWhatsAppMessage()}`, '_blank');
+  };
+
+  const handleBuyClick = () => {
+    if (!selectedSize && product.availableSizes.length > 0) {
+      setShowSizeWarning(true);
+      return;
+    }
+    navigate('/order', {
+      state: {
+        product: {
+          ...product,
+          selectedSize: selectedSize || product.availableSizes[0]
+        }
+      }
+    });
+  };
+
+  const handleAddToCart = () => {
+    if (!selectedSize && product.availableSizes.length > 0) {
+      setShowSizeWarning(true);
+      return;
+    }
+    if (selectedSize) {
+      addToCart(product, selectedSize);
+      onClose();
+    }
   };
 
   return (
@@ -185,13 +216,12 @@ Can you confirm availability and next steps?`;
                       key={size}
                       onClick={() => inStock && setSelectedSize(size)}
                       disabled={!inStock}
-                      className={`px-4 py-2 text-sm rounded-md border transition-all ${
-                        isSelected
+                      className={`px-4 py-2 text-sm rounded-md border transition-all ${isSelected
                           ? 'ring-2 ring-green-500 border-transparent bg-green-50 text-green-700'
                           : inStock
-                          ? 'border-gray-200 hover:border-gray-400 text-gray-700'
-                          : 'border-gray-100 bg-gray-50 text-gray-300 cursor-not-allowed'
-                      }`}
+                            ? 'border-gray-200 hover:border-gray-400 text-gray-700'
+                            : 'border-gray-100 bg-gray-50 text-gray-300 cursor-not-allowed'
+                        }`}
                     >
                       {size}
                       {!inStock && (
@@ -203,11 +233,39 @@ Can you confirm availability and next steps?`;
               </div>
             </div>
 
-            {/* WhatsApp Button */}
-            <div className="mt-6">
+            {/* Action Buttons */}
+            <div className="mt-6 space-y-3">
+              <div className="flex gap-3">
+                <button
+                  onClick={handleBuyClick}
+                  className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-3 rounded-lg text-white bg-black hover:bg-gray-800 transition-colors font-medium border border-black"
+                  disabled={product.availableSizes.length > 0 && !selectedSize}
+                >
+                  <ShoppingCart className="w-5 h-5" />
+                  Buy Now
+                </button>
+                <button
+                  onClick={handleAddToCart}
+                  className="inline-flex items-center justify-center gap-2 px-4 py-3 rounded-lg text-black bg-white hover:bg-gray-50 transition-colors font-medium border border-gray-200"
+                  title="Add to Cart"
+                  disabled={product.availableSizes.length > 0 && !selectedSize}
+                >
+                  <ShoppingBag className="w-5 h-5" />
+                </button>
+              </div>
+
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <span className="w-full border-t border-gray-200" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-white px-2 text-gray-500">Or</span>
+                </div>
+              </div>
+
               <button
                 onClick={handleWhatsAppClick}
-                className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-lg text-white bg-black hover:bg-gray-800 transition-colors font-medium"
+                className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-lg text-black bg-white hover:bg-gray-50 transition-colors font-medium border border-gray-200"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"

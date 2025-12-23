@@ -1,8 +1,7 @@
-import { useNavigate } from 'react-router-dom';
 import { Product } from '@/types/product';
 import { calculateDiscount } from '@/services/googleSheetsService';
 import { Button } from '@/components/ui/button';
-import { ShoppingCart } from 'lucide-react';
+import { Eye } from 'lucide-react';
 
 interface ProductCardProps {
   product: Product;
@@ -10,14 +9,13 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ product, onClick }: ProductCardProps) {
-  const navigate = useNavigate();
   const hasDiscount = product.originalPrice && product.price && product.originalPrice > product.price;
   const discount = hasDiscount ? calculateDiscount(product.price!, product.originalPrice!) : 0;
   const hasImage = product.images.length > 0;
 
-  const handleBuyClick = (e: React.MouseEvent) => {
+  const handleViewClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    navigate('/order', { state: { product } });
+    onClick();
   };
 
   return (
@@ -43,7 +41,7 @@ export default function ProductCard({ product, onClick }: ProductCardProps) {
               No Image Available
             </div>
           )}
-          
+
           {/* Badges */}
           <div className="absolute top-2 left-2 flex flex-col gap-1">
             {product.limitedEdition && (
@@ -75,7 +73,7 @@ export default function ProductCard({ product, onClick }: ProductCardProps) {
           {product.shortDescription && (
             <div className="text-sm text-gray-600 mt-2 line-clamp-2">{product.shortDescription}</div>
           )}
-          
+
           {/* Price */}
           <div className="mt-3 flex items-center gap-2">
             {product.price !== null ? (
@@ -109,14 +107,16 @@ export default function ProductCard({ product, onClick }: ProductCardProps) {
       </button>
 
       <div className="p-4 pt-0">
-        <Button 
-          onClick={handleBuyClick}
-          className="w-full bg-black hover:bg-gray-800 text-white"
+        <Button
+          onClick={handleViewClick}
+          variant="outline"
+          className="w-full border-black text-black hover:bg-black hover:text-white transition-colors"
         >
-          <ShoppingCart className="w-4 h-4 mr-2" />
-          Buy Now
+          <Eye className="w-4 h-4 mr-2" />
+          View Availability
         </Button>
       </div>
     </article>
   );
 }
+

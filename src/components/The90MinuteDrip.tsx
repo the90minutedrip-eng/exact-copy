@@ -8,6 +8,7 @@ import ProductModal from './ProductModal';
 import LoadingSpinner from './LoadingSpinner';
 import ErrorState from './ErrorState';
 import PromoBanner from './PromoBanner';
+import Header from './Header';
 
 const CONTACT_EMAIL = 'the90minutedrip@gmail.com';
 
@@ -83,18 +84,13 @@ export default function The90MinuteDrip() {
       <PromoBanner />
 
       {/* Header */}
-      <header className="py-6 px-6 border-b border-gray-100">
-        <div className="max-w-6xl mx-auto">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <h1 className="text-2xl font-semibold tracking-tight">The 90-Minute Drip</h1>
-            <div className="text-sm text-gray-500">
-              {!loading && !error && (
-                <span>{filteredProducts.length} of {products.length} jerseys</span>
-              )}
-            </div>
-          </div>
-        </div>
-      </header>
+      {/* Header */}
+      <Header
+        totalProducts={products.length}
+        filteredCount={filteredProducts.length}
+        loading={loading}
+        error={!!error}
+      />
 
       {/* Main Content */}
       <main className="flex-1 max-w-6xl mx-auto w-full p-6">

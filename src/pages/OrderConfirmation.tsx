@@ -37,9 +37,6 @@ const OrderConfirmation = () => {
     selectedSize: '',
   });
   const [isLoading, setIsLoading] = useState(false);
-  const [isCOD, setIsCOD] = useState(false);
-
-  const COD_CHARGE = 70;
 
   // Derived state
   const locationState = location.state as { product?: Product & { selectedSize?: SizeKey } };
@@ -97,8 +94,7 @@ const OrderConfirmation = () => {
 
   const shippingCharge = calculateShipping();
   const subtotal = isSingleBuy ? (singleProduct.price || 0) : getCartTotal();
-  const codCharge = isCOD ? COD_CHARGE : 0;
-  const finalTotal = subtotal + shippingCharge + codCharge;
+  const finalTotal = subtotal + shippingCharge;
 
   // Calculate how much more needed for free shipping
   const getFreeShippingMessage = () => {
@@ -252,19 +248,6 @@ const OrderConfirmation = () => {
                   {freeShippingMessage}
                 </div>
               )}
-              <div className="flex items-center gap-2 py-2 border-t">
-                <input
-                  type="checkbox"
-                  id="cod"
-                  checked={isCOD}
-                  onChange={(e) => setIsCOD(e.target.checked)}
-                  className="w-4 h-4 text-black border-gray-300 rounded focus:ring-black"
-                />
-                <label htmlFor="cod" className="text-sm cursor-pointer flex-1">
-                  Cash on Delivery (COD)
-                </label>
-                {isCOD && <span className="text-sm">₹{COD_CHARGE}</span>}
-              </div>
               <div className="flex justify-between font-bold text-lg pt-2 border-t">
                 <span>Total</span>
                 <span>₹{finalTotal}</span>

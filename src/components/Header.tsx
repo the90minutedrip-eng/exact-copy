@@ -19,7 +19,14 @@ export default function Header({ totalProducts, filteredCount, loading, error }:
             <div className="max-w-6xl mx-auto">
                 <div className="flex items-center justify-between gap-4">
                     <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
-                        <h1 className="text-2xl font-semibold tracking-tight">The 90-Minute Drip</h1>
+                        <div className="flex items-center gap-3">
+                            <img
+                                src="/logo.png"
+                                alt="The 90 Minute Drip Logo"
+                                className="h-10 w-10 object-contain"
+                            />
+                            <h1 className="text-2xl font-semibold tracking-tight">The 90-Minute Drip</h1>
+                        </div>
                         <div className="text-sm text-gray-500">
                             {!loading && !error && (
                                 <span>{filteredCount} of {totalProducts} jerseys</span>

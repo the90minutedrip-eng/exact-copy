@@ -12,6 +12,7 @@ export default function ProductCard({ product, onClick }: ProductCardProps) {
   const hasDiscount = product.originalPrice && product.price && product.originalPrice > product.price;
   const discount = hasDiscount ? calculateDiscount(product.price!, product.originalPrice!) : 0;
   const hasImage = product.images.length > 0;
+  const isSoldOut = product.availableSizes.length === 0;
 
   const handleViewClick = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -62,6 +63,15 @@ export default function ProductCard({ product, onClick }: ProductCardProps) {
             <span className="absolute top-2 right-2 bg-black/80 text-white text-[10px] sm:text-xs px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-md shadow-sm truncate max-w-[80px] sm:max-w-[120px]">
               {product.category}
             </span>
+          )}
+
+          {/* Sold Out Overlay */}
+          {isSoldOut && (
+            <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+              <div className="bg-red-500 text-white font-bold text-sm sm:text-base px-4 py-2 rounded-full border-2 border-white shadow-lg transform -rotate-12">
+                SOLD OUT
+              </div>
+            </div>
           )}
         </div>
 

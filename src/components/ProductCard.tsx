@@ -43,14 +43,15 @@ export default function ProductCard({ product, onClick }: ProductCardProps) {
           )}
 
           {/* Badges */}
-          <div className="absolute top-2 left-2 flex flex-col gap-1">
+          <div className="absolute top-2 left-2 flex flex-col gap-0.5 sm:gap-1 max-w-[45%]">
             {product.limitedEdition && (
-              <span className="bg-green-500 text-white text-xs px-2 py-1 rounded font-medium">
-                Limited Edition
+              <span className="bg-emerald-500 text-white text-[10px] sm:text-xs px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-md font-medium shadow-sm whitespace-nowrap">
+                <span className="sm:hidden">Limited</span>
+                <span className="hidden sm:inline">Limited Edition</span>
               </span>
             )}
             {discount > 0 && (
-              <span className="bg-red-500 text-white text-xs px-2 py-1 rounded font-medium">
+              <span className="bg-red-500 text-white text-[10px] sm:text-xs px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-md font-medium shadow-sm whitespace-nowrap">
                 {discount}% OFF
               </span>
             )}
@@ -58,7 +59,7 @@ export default function ProductCard({ product, onClick }: ProductCardProps) {
 
           {/* Category Label */}
           {product.category && (
-            <span className="absolute top-2 right-2 bg-black/70 text-white text-xs px-2 py-1 rounded">
+            <span className="absolute top-2 right-2 bg-black/80 text-white text-[10px] sm:text-xs px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-md shadow-sm truncate max-w-[80px] sm:max-w-[120px]">
               {product.category}
             </span>
           )}
@@ -110,10 +111,11 @@ export default function ProductCard({ product, onClick }: ProductCardProps) {
         <Button
           onClick={handleViewClick}
           variant="outline"
-          className="w-full border-black text-black hover:bg-black hover:text-white transition-colors"
+          className="w-full border-black text-black hover:bg-black hover:text-white transition-colors text-xs sm:text-sm"
         >
-          <Eye className="w-4 h-4 mr-2" />
-          View Availability
+          <Eye className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5 sm:mr-2 flex-shrink-0" />
+          <span className="sm:hidden">View</span>
+          <span className="hidden sm:inline">View Availability</span>
         </Button>
       </div>
     </article>

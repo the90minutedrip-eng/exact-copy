@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { Product } from '@/types/product';
-import { fetchProducts, getCategories, clearCache } from '@/services/googleSheetsService';
+import { fetchProducts, getCategories, clearCache, findProductById } from '@/services/googleSheetsService';
 import SearchAndFilters from './SearchAndFilters';
 import ProductGrid from './ProductGrid';
 import ProductModal from './ProductModal';
@@ -13,6 +13,7 @@ import Header from './Header';
 const CONTACT_EMAIL = 'the90minutedrip@gmail.com';
 
 export default function The90MinuteDrip() {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -40,6 +41,18 @@ export default function The90MinuteDrip() {
   useEffect(() => {
     loadProducts();
   }, [loadProducts]);
+
+  // Handle deep linking - auto-open product modal from URL
+  useEffect(() => {
+    const productId = searchParams.get('product');
+    if (productId && products.length > 0 && !loading) {
+      const product = findProductById(products, productId);
+      if (product) {
+        setSelectedProduct(product);
+        setSearchParams({}, { replace: true }); // Clean URL
+      }
+    }
+  }, [products, loading, searchParams, setSearchParams]);
 
   // Get max price for slider
   const maxPrice = useMemo(() => {

@@ -1,106 +1,85 @@
 
 
-## Plan: Add Share Button to Product Card
+## Plan: Use Stable Product ID from Google Sheet + Deep Linking
 
 ### Overview
-Add a share button to the product card that allows users to easily share product links with others. The button will use the Web Share API on supported devices (mobile) and fall back to copying the link to clipboard on desktop.
+Now that you've added an `ID` column to your Google Sheet with unique numbers, we'll update the code to use these stable IDs. This will make shared product links work correctly!
 
-### Implementation Details
+### What Will Change
 
-#### 1. Share Button Placement
-- Add an icon-only share button in the top-right corner of the product image
-- Position it below the category badge to avoid overlap
-- Use a semi-transparent circular button for clean aesthetics
+#### 1. Use Your New ID Column
+Instead of generating IDs like `product-1-1234567890`, the app will now use the actual ID from your Google Sheet (e.g., `101`, `102`, etc.)
 
-#### 2. Share Functionality
-The share feature will work in two ways:
-
-**On Mobile (using Web Share API):**
-- Opens native share sheet (WhatsApp, Instagram, SMS, etc.)
-- Shares product name, short description, and URL
-
-**On Desktop (clipboard fallback):**
-- Copies the product URL to clipboard
-- Shows a toast notification confirming the copy
-
-#### 3. URL Structure
-The share URL will use the current website URL with a product ID query parameter:
-```
-https://the90minutedrip.lovable.app/?product={productId}
-```
-
-This way, when someone opens the link, it will load the homepage and can potentially deep-link to the product modal.
+#### 2. Deep Linking Support
+When someone opens a shared link like `yoursite.com/?product=101`, the product modal will automatically open for that product.
 
 ---
 
 ### Technical Details
 
-#### File Changes: `src/components/ProductCard.tsx`
+#### File 1: `src/services/googleSheetsService.ts`
 
-**New imports:**
-- `Share2` icon from `lucide-react`
-- `toast` from `sonner` for clipboard feedback
+**Changes:**
+- Read the new `ID` column from the CSV
+- Use it as the product's stable identifier
+- Fall back to row index if ID is missing (safety measure)
+- Add `findProductById()` helper function for deep linking
 
-**New share handler function:**
 ```typescript
-const handleShare = async (e: React.MouseEvent) => {
-  e.stopPropagation();
-  
-  const shareUrl = `${window.location.origin}/?product=${product.id}`;
-  const shareData = {
-    title: product.productName,
-    text: product.shortDescription || `Check out ${product.productName}`,
-    url: shareUrl,
-  };
+// Line 149 changes from:
+id: `product-${i}-${Date.now()}`
 
-  if (navigator.share && navigator.canShare(shareData)) {
-    // Mobile: Use native share
-    await navigator.share(shareData);
-  } else {
-    // Desktop: Copy to clipboard
-    await navigator.clipboard.writeText(shareUrl);
-    toast.success('Link copied to clipboard!');
-  }
-};
+// To:
+id: getValue('ID') || `product-${i}`
 ```
 
-**Share button UI:**
-- Positioned in bottom-right of image area
-- Circular button with white background and subtle shadow
-- Responsive sizing: `w-7 h-7 sm:w-8 sm:h-8`
-- Share2 icon with responsive sizing
-
-```jsx
-<button
-  onClick={handleShare}
-  className="absolute bottom-2 right-2 w-7 h-7 sm:w-8 sm:h-8 bg-white/90 hover:bg-white rounded-full shadow-md flex items-center justify-center transition-colors"
-  aria-label="Share product"
->
-  <Share2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-700" />
-</button>
+**New helper function:**
+```typescript
+export function findProductById(products: Product[], id: string): Product | undefined {
+  return products.find(p => p.id === id);
+}
 ```
 
 ---
 
-### Visual Layout
+#### File 2: `src/components/The90MinuteDrip.tsx`
+
+**Changes:**
+- Import `useSearchParams` from react-router-dom
+- After products load, check for `?product=` in URL
+- If found, auto-open that product's modal
+- Clear the URL parameter after opening (keeps URL clean)
+
+**New effect for deep linking:**
+```typescript
+useEffect(() => {
+  const productId = searchParams.get('product');
+  if (productId && products.length > 0 && !loading) {
+    const product = findProductById(products, productId);
+    if (product) {
+      setSelectedProduct(product);
+      setSearchParams({}, { replace: true }); // Clean URL
+    }
+  }
+}, [products, loading, searchParams]);
+```
+
+---
+
+### Share URL Flow After Implementation
 
 ```text
-+----------------------------------+
-|  [Limited]        [Category]     |  <- Top badges
-|                                  |
-|       Product Image              |
-|                                  |
-|          SOLD OUT (if applicable)|
-|                          [Share] |  <- Bottom-right share button
-+----------------------------------+
-|  Product Name                    |
-|  Team                           |
-|  Description...                 |
-|  Price                          |
-|  Sizes: [S] [M] [L] +2          |
-+----------------------------------+
-|  [View Availability Button]      |
-+----------------------------------+
+1. User clicks Share button on product with ID "101"
+       ↓
+2. URL copied: https://yoursite.com/?product=101
+       ↓
+3. Recipient opens link
+       ↓
+4. Page loads, detects ?product=101
+       ↓
+5. Finds product with ID "101"
+       ↓
+6. Auto-opens ProductModal for that product
 ```
 
 ---
@@ -109,5 +88,11 @@ const handleShare = async (e: React.MouseEvent) => {
 
 | File | Changes |
 |------|---------|
-| `src/components/ProductCard.tsx` | Add Share2 import, add toast import, add handleShare function, add share button in image area |
+| `src/services/googleSheetsService.ts` | Use `ID` column for product ID, add `findProductById()` helper |
+| `src/components/The90MinuteDrip.tsx` | Add deep-link support to auto-open shared product URLs |
+
+---
+
+### Important Note
+Make sure the `ID` column header in your Google Sheet is exactly `ID` (case-sensitive) for this to work correctly.
 

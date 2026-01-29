@@ -1,7 +1,8 @@
 import { Product } from '@/types/product';
 import { calculateDiscount } from '@/services/googleSheetsService';
 import { Button } from '@/components/ui/button';
-import { Eye } from 'lucide-react';
+import { Eye, Share2 } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface ProductCardProps {
   product: Product;
@@ -17,6 +18,32 @@ export default function ProductCard({ product, onClick }: ProductCardProps) {
   const handleViewClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     onClick();
+  };
+
+  const handleShare = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    
+    const shareUrl = `${window.location.origin}/?product=${product.id}`;
+    const shareData = {
+      title: product.productName,
+      text: product.shortDescription || `Check out ${product.productName}`,
+      url: shareUrl,
+    };
+
+    try {
+      if (navigator.share && navigator.canShare(shareData)) {
+        await navigator.share(shareData);
+      } else {
+        await navigator.clipboard.writeText(shareUrl);
+        toast.success('Link copied to clipboard!');
+      }
+    } catch (error) {
+      // User cancelled share or error occurred
+      if ((error as Error).name !== 'AbortError') {
+        await navigator.clipboard.writeText(shareUrl);
+        toast.success('Link copied to clipboard!');
+      }
+    }
   };
 
   return (
@@ -73,6 +100,15 @@ export default function ProductCard({ product, onClick }: ProductCardProps) {
               </div>
             </div>
           )}
+
+          {/* Share Button */}
+          <button
+            onClick={handleShare}
+            className="absolute bottom-2 right-2 w-7 h-7 sm:w-8 sm:h-8 bg-white/90 hover:bg-white rounded-full shadow-md flex items-center justify-center transition-colors z-10"
+            aria-label="Share product"
+          >
+            <Share2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-700" />
+          </button>
         </div>
 
         {/* Content */}

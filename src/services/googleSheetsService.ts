@@ -146,7 +146,7 @@ export function parseProducts(csvText: string): Product[] {
       .toLowerCase();
 
     const product: Product = {
-      id: `product-${i}-${Date.now()}`,
+      id: getValue('ID') || `product-${i}`,
       productName,
       team,
       category,
@@ -302,4 +302,11 @@ export function getCategories(products: Product[]): string[] {
 export function calculateDiscount(price: number, originalPrice: number): number {
   if (!originalPrice || originalPrice <= price) return 0;
   return Math.round((originalPrice - price) / originalPrice * 100);
+}
+
+/**
+ * Find a product by its ID
+ */
+export function findProductById(products: Product[], id: string): Product | undefined {
+  return products.find(p => p.id === id);
 }

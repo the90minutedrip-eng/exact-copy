@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { Product, SIZES, SizeKey } from '@/types/product';
 import { calculateDiscount } from '@/services/googleSheetsService';
 import { useCart } from '@/contexts/CartContext';
-import { Button } from '@/components/ui/button';
 import { Share2 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -61,11 +60,11 @@ export default function ProductCard({ product, onClick }: ProductCardProps) {
   };
 
   return (
-    <article className="bg-white flex flex-col h-full">
-      {/* Clickable Image and Title area */}
-      <button onClick={onClick} className="w-full text-left flex-1 flex flex-col">
-        {/* Image */}
-        <div className="aspect-square bg-gray-50 flex items-center justify-center relative overflow-hidden">
+    <article className="bg-white flex flex-col">
+      {/* Clickable Image area */}
+      <button onClick={onClick} className="w-full text-left">
+        {/* Image - more compact aspect ratio */}
+        <div className="aspect-[4/5] bg-gray-100 flex items-center justify-center relative overflow-hidden">
           {hasImage ? (
             <img
               src={product.images[0]}
@@ -75,85 +74,81 @@ export default function ProductCard({ product, onClick }: ProductCardProps) {
               onError={(e) => {
                 const target = e.target as HTMLImageElement;
                 target.style.display = 'none';
-                target.parentElement!.classList.add('fallback-shown');
               }}
             />
-          ) : null}
-          {!hasImage && (
-            <div className="absolute inset-0 flex items-center justify-center bg-gray-100 text-gray-400 text-sm">
-              No Image Available
-            </div>
+          ) : (
+            <span className="text-gray-400 text-xs">No Image</span>
           )}
 
-          {/* Badges */}
-          <div className="absolute top-2 left-2 flex flex-col gap-1">
+          {/* Badges - compact */}
+          <div className="absolute top-1 left-1 flex flex-col gap-0.5">
             {product.limitedEdition && (
-              <span className="bg-emerald-500 text-white text-[10px] sm:text-xs px-1.5 sm:px-2 py-0.5 rounded font-medium">
-                Limited
+              <span className="bg-black text-white text-[8px] px-1 py-0.5 font-medium">
+                LIMITED
               </span>
             )}
             {discount > 0 && (
-              <span className="bg-red-500 text-white text-[10px] sm:text-xs px-1.5 sm:px-2 py-0.5 rounded font-medium">
-                {discount}% OFF
+              <span className="bg-black text-white text-[8px] px-1 py-0.5 font-medium">
+                {discount}% off
               </span>
             )}
           </div>
 
           {/* Sold Out Overlay */}
           {isSoldOut && (
-            <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-              <div className="bg-red-500 text-white font-bold text-sm px-4 py-2 rounded-full border-2 border-white shadow-lg transform -rotate-12">
+            <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+              <span className="bg-white text-black text-[10px] font-bold px-2 py-1">
                 SOLD OUT
-              </div>
+              </span>
             </div>
           )}
 
           {/* Share Button */}
           <button
             onClick={handleShare}
-            className="absolute bottom-2 right-2 w-8 h-8 bg-white/90 hover:bg-white rounded-full shadow-md flex items-center justify-center transition-colors z-10"
+            className="absolute bottom-1 right-1 w-6 h-6 bg-white/90 hover:bg-white flex items-center justify-center z-10"
             aria-label="Share product"
           >
-            <Share2 className="w-4 h-4 text-gray-700" />
+            <Share2 className="w-3 h-3 text-black" />
           </button>
-        </div>
-
-        {/* Product Name */}
-        <div className="pt-3 px-1">
-          <h3 className="font-bold text-xs sm:text-sm text-black uppercase leading-tight line-clamp-2 tracking-wide">
-            {product.productName}
-          </h3>
         </div>
       </button>
 
-      {/* Pricing and Actions - Not clickable for modal */}
-      <div className="px-1 pb-2 mt-auto">
+      {/* Product Info - compact */}
+      <div className="py-2 flex flex-col gap-1">
+        {/* Product Name */}
+        <button onClick={onClick} className="text-left">
+          <h3 className="font-bold text-[10px] sm:text-xs text-black uppercase leading-tight line-clamp-2 tracking-wide">
+            {product.productName}
+          </h3>
+        </button>
+
         {/* Price */}
-        <div className="mt-2">
+        <div className="flex items-baseline gap-1.5">
           {product.price !== null ? (
-            <div className="flex flex-col">
+            <>
               {hasDiscount && (
-                <span className="text-xs text-gray-500 line-through">
-                  Rs. {product.originalPrice!.toLocaleString('en-IN')}.00
+                <span className="text-[9px] sm:text-[10px] text-gray-500 line-through">
+                  Rs. {product.originalPrice!.toLocaleString('en-IN')}
                 </span>
               )}
-              <span className="font-bold text-base sm:text-lg text-black">
-                Rs. {product.price.toLocaleString('en-IN')}.00
+              <span className="font-bold text-xs sm:text-sm text-black">
+                Rs. {product.price.toLocaleString('en-IN')}
               </span>
-            </div>
+            </>
           ) : (
-            <span className="text-sm text-gray-500 italic">Price on request</span>
+            <span className="text-[10px] text-gray-500 italic">Price on request</span>
           )}
         </div>
 
-        {/* Size Selectors */}
+        {/* Size Selectors - inline compact */}
         {product.availableSizes.length > 0 && (
-          <div className="mt-2 flex flex-wrap gap-1">
+          <div className="flex flex-wrap gap-0.5 mt-0.5">
             {SIZES.filter(size => product.availableSizes.includes(size)).map(size => (
               <button
                 key={size}
                 onClick={(e) => handleSizeClick(e, size)}
-                className={`min-w-[24px] h-6 px-1.5 text-[10px] font-medium border transition-colors ${
+                className={`min-w-[22px] h-5 px-1 text-[9px] font-medium border transition-colors ${
                   selectedSize === size
                     ? 'bg-black text-white border-black'
                     : 'bg-white text-black border-gray-300 hover:border-black'
@@ -165,24 +160,24 @@ export default function ProductCard({ product, onClick }: ProductCardProps) {
           </div>
         )}
 
-        {/* Add to Cart Button */}
+        {/* Add to Cart Button - sharp corners */}
         {!isSoldOut && product.price !== null && (
-          <Button
+          <button
             onClick={handleAddToCart}
-            className="w-full mt-3 bg-black text-white hover:bg-gray-800 rounded-none text-xs sm:text-sm font-semibold tracking-wider uppercase h-10"
+            className="w-full mt-1 bg-black text-white hover:bg-gray-800 text-[9px] sm:text-[10px] font-semibold tracking-wider uppercase h-7 transition-colors"
           >
             ADD TO CART
-          </Button>
+          </button>
         )}
 
         {/* Sold Out State */}
         {isSoldOut && (
-          <Button
+          <button
             disabled
-            className="w-full mt-3 bg-gray-200 text-gray-500 rounded-none text-xs sm:text-sm font-semibold tracking-wider uppercase h-10 cursor-not-allowed"
+            className="w-full mt-1 bg-gray-200 text-gray-500 text-[9px] sm:text-[10px] font-semibold tracking-wider uppercase h-7 cursor-not-allowed"
           >
             SOLD OUT
-          </Button>
+          </button>
         )}
       </div>
     </article>

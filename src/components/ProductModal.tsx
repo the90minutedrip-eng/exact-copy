@@ -39,14 +39,36 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
     }
   }, [onClose]);
 
+  // Handle browser back button - push state when modal opens
   useEffect(() => {
+    // Push a history state when modal opens
+    window.history.pushState({ modal: 'product' }, '');
+
+    const handlePopState = () => {
+      // When back button is pressed, close the modal
+      onClose();
+    };
+
+    window.addEventListener('popstate', handlePopState);
     document.addEventListener('keydown', handleKeyDown);
     document.body.style.overflow = 'hidden';
+
     return () => {
+      window.removeEventListener('popstate', handlePopState);
       document.removeEventListener('keydown', handleKeyDown);
       document.body.style.overflow = '';
     };
-  }, [handleKeyDown]);
+  }, [handleKeyDown, onClose]);
+
+  // When modal is closed via X button or other means, go back in history
+  const handleClose = useCallback(() => {
+    // Check if we pushed a modal state
+    if (window.history.state?.modal === 'product') {
+      window.history.back();
+    } else {
+      onClose();
+    }
+  }, [onClose]);
 
   const generateWhatsAppMessage = () => {
     const priceText = product.price !== null ? `₹${product.price.toLocaleString()}` : 'Price on request';
@@ -123,7 +145,7 @@ Can you confirm availability and next steps?`;
       {/* Backdrop */}
       <div
         className="absolute inset-0 bg-black/50"
-        onClick={onClose}
+        onClick={handleClose}
         aria-hidden="true"
       />
 
@@ -137,7 +159,7 @@ Can you confirm availability and next steps?`;
       >
         {/* Close button */}
         <button
-          onClick={onClose}
+          onClick={handleClose}
           className="absolute top-2 right-2 z-10 w-8 h-8 flex items-center justify-center bg-white/90 hover:bg-white rounded-full shadow-md transition-colors"
           aria-label="Close modal"
         >

@@ -1,7 +1,9 @@
-import { Product } from '@/types/product';
+import { useState } from 'react';
+import { Product, SIZES, SizeKey } from '@/types/product';
 import { calculateDiscount } from '@/services/googleSheetsService';
+import { useCart } from '@/contexts/CartContext';
 import { Button } from '@/components/ui/button';
-import { Eye, Share2 } from 'lucide-react';
+import { Share2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface ProductCardProps {
@@ -10,15 +12,13 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ product, onClick }: ProductCardProps) {
+  const { addToCart } = useCart();
+  const [selectedSize, setSelectedSize] = useState<SizeKey | null>(null);
+  
   const hasDiscount = product.originalPrice && product.price && product.originalPrice > product.price;
   const discount = hasDiscount ? calculateDiscount(product.price!, product.originalPrice!) : 0;
   const hasImage = product.images.length > 0;
   const isSoldOut = product.availableSizes.length === 0;
-
-  const handleViewClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    onClick();
-  };
 
   const handleShare = async (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -38,7 +38,6 @@ export default function ProductCard({ product, onClick }: ProductCardProps) {
         toast.success('Link copied to clipboard!');
       }
     } catch (error) {
-      // User cancelled share or error occurred
       if ((error as Error).name !== 'AbortError') {
         await navigator.clipboard.writeText(shareUrl);
         toast.success('Link copied to clipboard!');
@@ -46,11 +45,27 @@ export default function ProductCard({ product, onClick }: ProductCardProps) {
     }
   };
 
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (selectedSize) {
+      addToCart(product, selectedSize);
+      toast.success(`${product.productName} added to cart!`);
+    } else {
+      toast.error('Please select a size');
+    }
+  };
+
+  const handleSizeClick = (e: React.MouseEvent, size: SizeKey) => {
+    e.stopPropagation();
+    setSelectedSize(size);
+  };
+
   return (
-    <article className="border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow bg-white flex flex-col">
-      <button onClick={onClick} className="w-full text-left flex-1">
-        {/* Image or Fallback */}
-        <div className="h-56 bg-gray-50 flex items-center justify-center relative">
+    <article className="bg-white flex flex-col h-full">
+      {/* Clickable Image and Title area */}
+      <button onClick={onClick} className="w-full text-left flex-1 flex flex-col">
+        {/* Image */}
+        <div className="aspect-square bg-gray-50 flex items-center justify-center relative overflow-hidden">
           {hasImage ? (
             <img
               src={product.images[0]}
@@ -71,31 +86,23 @@ export default function ProductCard({ product, onClick }: ProductCardProps) {
           )}
 
           {/* Badges */}
-          <div className="absolute top-2 left-2 flex flex-col gap-0.5 sm:gap-1 max-w-[45%]">
+          <div className="absolute top-2 left-2 flex flex-col gap-1">
             {product.limitedEdition && (
-              <span className="bg-emerald-500 text-white text-[10px] sm:text-xs px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-md font-medium shadow-sm whitespace-nowrap">
-                <span className="sm:hidden">Limited</span>
-                <span className="hidden sm:inline">Limited Edition</span>
+              <span className="bg-emerald-500 text-white text-[10px] sm:text-xs px-1.5 sm:px-2 py-0.5 rounded font-medium">
+                Limited
               </span>
             )}
             {discount > 0 && (
-              <span className="bg-red-500 text-white text-[10px] sm:text-xs px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-md font-medium shadow-sm whitespace-nowrap">
+              <span className="bg-red-500 text-white text-[10px] sm:text-xs px-1.5 sm:px-2 py-0.5 rounded font-medium">
                 {discount}% OFF
               </span>
             )}
           </div>
 
-          {/* Category Label */}
-          {product.category && (
-            <span className="absolute top-2 right-2 bg-black/80 text-white text-[10px] sm:text-xs px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-md shadow-sm truncate max-w-[80px] sm:max-w-[120px]">
-              {product.category}
-            </span>
-          )}
-
           {/* Sold Out Overlay */}
           {isSoldOut && (
             <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-              <div className="bg-red-500 text-white font-bold text-sm sm:text-base px-4 py-2 rounded-full border-2 border-white shadow-lg transform -rotate-12">
+              <div className="bg-red-500 text-white font-bold text-sm px-4 py-2 rounded-full border-2 border-white shadow-lg transform -rotate-12">
                 SOLD OUT
               </div>
             </div>
@@ -104,67 +111,80 @@ export default function ProductCard({ product, onClick }: ProductCardProps) {
           {/* Share Button */}
           <button
             onClick={handleShare}
-            className="absolute bottom-2 right-2 w-7 h-7 sm:w-8 sm:h-8 bg-white/90 hover:bg-white rounded-full shadow-md flex items-center justify-center transition-colors z-10"
+            className="absolute bottom-2 right-2 w-8 h-8 bg-white/90 hover:bg-white rounded-full shadow-md flex items-center justify-center transition-colors z-10"
             aria-label="Share product"
           >
-            <Share2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-700" />
+            <Share2 className="w-4 h-4 text-gray-700" />
           </button>
         </div>
 
-        {/* Content */}
-        <div className="p-4">
-          <div className="font-medium text-black line-clamp-1">{product.productName}</div>
-          {product.team && (
-            <div className="text-xs text-gray-500 mt-1">{product.team}</div>
-          )}
-          {product.shortDescription && (
-            <div className="text-sm text-gray-600 mt-2 line-clamp-2">{product.shortDescription}</div>
-          )}
-
-          {/* Price */}
-          <div className="mt-3 flex items-center gap-2">
-            {product.price !== null ? (
-              <>
-                <span className="font-semibold text-black">₹{product.price.toLocaleString()}</span>
-                {hasDiscount && (
-                  <span className="text-sm text-gray-400 line-through">
-                    ₹{product.originalPrice!.toLocaleString()}
-                  </span>
-                )}
-              </>
-            ) : (
-              <span className="text-sm text-gray-500 italic">Price on request</span>
-            )}
-          </div>
-
-          {/* Available sizes preview */}
-          {product.availableSizes.length > 0 && (
-            <div className="mt-2 flex gap-1 flex-wrap">
-              {product.availableSizes.slice(0, 4).map(size => (
-                <span key={size} className="text-xs bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded">
-                  {size}
-                </span>
-              ))}
-              {product.availableSizes.length > 4 && (
-                <span className="text-xs text-gray-400">+{product.availableSizes.length - 4}</span>
-              )}
-            </div>
-          )}
+        {/* Product Name */}
+        <div className="pt-3 px-1">
+          <h3 className="font-bold text-xs sm:text-sm text-black uppercase leading-tight line-clamp-2 tracking-wide">
+            {product.productName}
+          </h3>
         </div>
       </button>
 
-      <div className="p-4 pt-0">
-        <Button
-          onClick={handleViewClick}
-          variant="outline"
-          className="w-full border-black text-black hover:bg-black hover:text-white transition-colors text-xs sm:text-sm"
-        >
-          <Eye className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5 sm:mr-2 flex-shrink-0" />
-          <span className="sm:hidden">View</span>
-          <span className="hidden sm:inline">View Availability</span>
-        </Button>
+      {/* Pricing and Actions - Not clickable for modal */}
+      <div className="px-1 pb-2 mt-auto">
+        {/* Price */}
+        <div className="mt-2">
+          {product.price !== null ? (
+            <div className="flex flex-col">
+              {hasDiscount && (
+                <span className="text-xs text-gray-500 line-through">
+                  Rs. {product.originalPrice!.toLocaleString('en-IN')}.00
+                </span>
+              )}
+              <span className="font-bold text-base sm:text-lg text-black">
+                Rs. {product.price.toLocaleString('en-IN')}.00
+              </span>
+            </div>
+          ) : (
+            <span className="text-sm text-gray-500 italic">Price on request</span>
+          )}
+        </div>
+
+        {/* Size Selectors */}
+        {product.availableSizes.length > 0 && (
+          <div className="mt-3 flex flex-wrap gap-1.5">
+            {SIZES.filter(size => product.availableSizes.includes(size)).map(size => (
+              <button
+                key={size}
+                onClick={(e) => handleSizeClick(e, size)}
+                className={`min-w-[32px] h-8 px-2 text-xs font-medium border transition-colors ${
+                  selectedSize === size
+                    ? 'bg-black text-white border-black'
+                    : 'bg-white text-black border-gray-300 hover:border-black'
+                }`}
+              >
+                {size}
+              </button>
+            ))}
+          </div>
+        )}
+
+        {/* Add to Cart Button */}
+        {!isSoldOut && product.price !== null && (
+          <Button
+            onClick={handleAddToCart}
+            className="w-full mt-3 bg-black text-white hover:bg-gray-800 rounded-none text-xs sm:text-sm font-semibold tracking-wider uppercase h-10"
+          >
+            ADD TO CART
+          </Button>
+        )}
+
+        {/* Sold Out State */}
+        {isSoldOut && (
+          <Button
+            disabled
+            className="w-full mt-3 bg-gray-200 text-gray-500 rounded-none text-xs sm:text-sm font-semibold tracking-wider uppercase h-10 cursor-not-allowed"
+          >
+            SOLD OUT
+          </Button>
+        )}
       </div>
     </article>
   );
 }
-

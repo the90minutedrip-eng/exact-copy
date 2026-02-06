@@ -70,7 +70,7 @@ export default function ProductCard({ product, onClick }: ProductCardProps) {
             <img
               src={product.images[0]}
               alt={product.productName}
-              className="object-cover h-full w-full"
+              className="object-contain h-full w-full"
               loading="lazy"
               onError={(e) => {
                 const target = e.target as HTMLImageElement;

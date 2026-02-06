@@ -239,6 +239,18 @@ Can you confirm availability and next steps?`;
             {product.productName}
           </h2>
 
+          {/* Team & Season */}
+          <p className="text-sm text-gray-600 mt-1">
+            {product.team} {product.season && `• ${product.season}`}
+          </p>
+
+          {/* Description */}
+          {product.description && (
+            <p className="text-sm text-gray-600 mt-2 leading-relaxed">
+              {product.description}
+            </p>
+          )}
+
           {/* Discount Badge */}
           {discount > 0 && (
             <div className="mt-3">

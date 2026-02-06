@@ -141,26 +141,27 @@ Can you confirm availability and next steps?`;
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4">
-      {/* Backdrop */}
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center sm:justify-center sm:p-4">
+      {/* Backdrop - hidden on mobile since modal is full screen */}
       <div
-        className="absolute inset-0 bg-black/50"
+        className="absolute inset-0 bg-black/50 hidden sm:block"
         onClick={handleClose}
         aria-hidden="true"
       />
 
-      {/* Modal - Centered on all devices with proper height constraints */}
+      {/* Modal - Full screen on mobile, centered card on desktop */}
       <div
         role="dialog"
         aria-modal="true"
         aria-labelledby="modal-title"
-        className="relative bg-white w-full sm:max-w-lg max-h-[calc(100vh-1rem)] sm:max-h-[90vh] overflow-y-auto"
+        className="relative bg-white w-full h-full sm:h-auto sm:max-w-lg sm:max-h-[90vh] overflow-y-auto"
         style={{ paddingTop: 'env(safe-area-inset-top)', paddingBottom: 'env(safe-area-inset-bottom)' }}
       >
         {/* Close button */}
         <button
           onClick={handleClose}
-          className="absolute top-2 right-2 z-10 w-8 h-8 flex items-center justify-center bg-white/90 hover:bg-white rounded-full shadow-md transition-colors"
+          className="absolute top-3 right-3 z-10 w-9 h-9 flex items-center justify-center bg-white/90 hover:bg-white rounded-full shadow-md transition-colors"
+          style={{ top: 'calc(env(safe-area-inset-top) + 12px)' }}
           aria-label="Close modal"
         >
           <X className="w-5 h-5 text-gray-700" />
@@ -169,7 +170,8 @@ Can you confirm availability and next steps?`;
         {/* Share button */}
         <button
           onClick={handleShare}
-          className="absolute top-2 right-12 z-10 w-8 h-8 flex items-center justify-center bg-white/90 hover:bg-white rounded-full shadow-md transition-colors"
+          className="absolute top-3 right-14 z-10 w-9 h-9 flex items-center justify-center bg-white/90 hover:bg-white rounded-full shadow-md transition-colors"
+          style={{ top: 'calc(env(safe-area-inset-top) + 12px)' }}
           aria-label="Share product"
         >
           <Share2 className="w-4 h-4 text-gray-700" />

@@ -148,12 +148,12 @@ export default function ProductCard({ product, onClick }: ProductCardProps) {
 
         {/* Size Selectors */}
         {product.availableSizes.length > 0 && (
-          <div className="mt-3 flex flex-wrap gap-1.5">
+          <div className="mt-2 flex flex-wrap gap-1">
             {SIZES.filter(size => product.availableSizes.includes(size)).map(size => (
               <button
                 key={size}
                 onClick={(e) => handleSizeClick(e, size)}
-                className={`min-w-[32px] h-8 px-2 text-xs font-medium border transition-colors ${
+                className={`min-w-[24px] h-6 px-1.5 text-[10px] font-medium border transition-colors ${
                   selectedSize === size
                     ? 'bg-black text-white border-black'
                     : 'bg-white text-black border-gray-300 hover:border-black'

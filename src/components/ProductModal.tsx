@@ -119,7 +119,7 @@ Can you confirm availability and next steps?`;
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4">
       {/* Backdrop */}
       <div
         className="absolute inset-0 bg-black/50"
@@ -127,17 +127,18 @@ Can you confirm availability and next steps?`;
         aria-hidden="true"
       />
 
-      {/* Modal - Full screen on mobile, centered card on desktop */}
+      {/* Modal - Centered on all devices with proper height constraints */}
       <div
         role="dialog"
         aria-modal="true"
         aria-labelledby="modal-title"
-        className="relative bg-white w-full sm:max-w-lg sm:mx-4 max-h-[95vh] sm:max-h-[90vh] overflow-y-auto"
+        className="relative bg-white w-full sm:max-w-lg max-h-[calc(100vh-1rem)] sm:max-h-[90vh] overflow-y-auto"
+        style={{ paddingTop: 'env(safe-area-inset-top)', paddingBottom: 'env(safe-area-inset-bottom)' }}
       >
         {/* Close button */}
         <button
           onClick={onClose}
-          className="absolute top-3 right-3 z-10 w-8 h-8 flex items-center justify-center bg-white/90 hover:bg-white rounded-full shadow-md transition-colors"
+          className="absolute top-2 right-2 z-10 w-8 h-8 flex items-center justify-center bg-white/90 hover:bg-white rounded-full shadow-md transition-colors"
           aria-label="Close modal"
         >
           <X className="w-5 h-5 text-gray-700" />
@@ -146,14 +147,14 @@ Can you confirm availability and next steps?`;
         {/* Share button */}
         <button
           onClick={handleShare}
-          className="absolute top-3 right-14 z-10 w-8 h-8 flex items-center justify-center bg-white/90 hover:bg-white rounded-full shadow-md transition-colors"
+          className="absolute top-2 right-12 z-10 w-8 h-8 flex items-center justify-center bg-white/90 hover:bg-white rounded-full shadow-md transition-colors"
           aria-label="Share product"
         >
           <Share2 className="w-4 h-4 text-gray-700" />
         </button>
 
-        {/* Main Image */}
-        <div className="w-full aspect-square bg-gray-50 relative">
+        {/* Main Image - Smaller aspect ratio on mobile */}
+        <div className="w-full aspect-[4/3] sm:aspect-square bg-gray-50 relative">
           {allMedia.length > 0 ? (
             currentImageIndex >= product.images.length ? (
               <video

@@ -265,7 +265,7 @@ Can you confirm availability and next steps?`;
                   <span className="text-red-500 text-xs">Please select a size</span>
                 )}
               </div>
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-3 gap-2">
                 {SIZES.filter(size => product.availableSizes.includes(size)).map(size => {
                   const isSelected = selectedSize === size;
                   return (
